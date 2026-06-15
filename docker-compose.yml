@@ -1,0 +1,40 @@
+# ru_rpg + OmniRoute (Claude Sonnet 4.5), полностью на русском
+#
+# Запуск:
+#   1) скопируй config.omniroute.yaml -> config.yaml и впиши свой токен omniroute
+#   2) docker compose up -d --build
+#   3) открой http://localhost:7777
+#
+# OmniRoute должен быть запущен на ХОСТЕ и слушать порт 20128.
+# Контейнер ходит на него через host.docker.internal (см. extra_hosts).
+
+services:
+  ru_rpg:
+    build: .
+    image: ru_rpg:latest
+    container_name: ru_rpg
+    restart: unless-stopped
+    ports:
+      - "7777:7777"
+    extra_hosts:
+      # Даёт контейнеру доступ к сервисам, слушающим localhost ХОСТА
+      # (нужно для OmniRoute на http://localhost:20128). На Docker Desktop работает из коробки.
+      - "host.docker.internal:host-gateway"
+    volumes:
+      # Конфиг — rw, потому что приложение умеет править его через /config в UI
+      - ./config.yaml:/app/config.yaml
+      # Персистентные данные игры
+      - ./saves:/app/saves
+      - ./autosaves:/app/autosaves
+      - ./exports:/app/exports
+      - ./logs:/app/logs
+      - ./logs_prev:/app/logs_prev
+      - ./lorebooks:/app/lorebooks
+      - ./new-game-settings:/app/new-game-settings
+      - ./public/generated-images:/app/public/generated-images
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:7777/').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
