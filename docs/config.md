@@ -197,7 +197,7 @@ formulas:
 - `skill.<name>` (ex: `skill.lockpicking`)
 - `infinity` (constant = 1e100)
 
-Attribute/skill names are normalized to lowercase with non-alphanumeric characters replaced by underscores (for example, `Two-Handed Weapons` becomes `skill.two_handed_weapons`).
+Attribute/skill names are normalized to lowercase with non-alphanumeric characters replaced by underscores (for example, `Two-Handed Weapons` becomes `skill.two_handed_weapons`). Normalization is Unicode-aware: letters and digits from any script are kept, so localized names work too (for example, `Знание Городской Навигации` becomes `skill.знание_городской_навигации`).
 `attribute.*` always reflects base values; `attribute_modified.*` reflects modified values (if supplied).
 
 ### Functions

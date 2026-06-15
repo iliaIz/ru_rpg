@@ -24,7 +24,9 @@
     if (!raw) {
       throw new Error('Variable key cannot be empty.');
     }
-    const normalized = raw.replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+    // Unicode-aware: treat any letter (incl. Cyrillic, etc.) or number as
+    // alphanumeric so non-English skill/attribute names yield valid keys.
+    const normalized = raw.replace(/[^\p{L}\p{N}]+/gu, '_').replace(/^_+|_+$/g, '');
     if (!normalized) {
       throw new Error(`Variable key "${value}" has no alphanumeric characters.`);
     }
@@ -69,7 +71,7 @@
         this.index += raw.length;
         return { type: 'number', value: Number(raw) };
       }
-      const identMatch = remaining.match(/^[A-Za-z_][A-Za-z0-9_.]*/);
+      const identMatch = remaining.match(/^[\p{L}_][\p{L}\p{N}_.]*/u);
       if (identMatch) {
         const name = identMatch[0];
         this.index += name.length;
